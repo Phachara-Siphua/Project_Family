@@ -25,9 +25,10 @@
     <div class="h-20"></div>
 
     <div class="container mx-auto px-6 py-8 min-h-screen">
-        <h1 class="text-3xl md:text-4xl font-serif font-bold text-center text-mercy-green mb-10 mt-5">ผลงานทั้งหมดของเรา</h1>
+        <h1 class="text-3xl md:text-4xl font-serif font-bold text-center text-mercy-green mb-2 mt-5">ผลงานทั้งหมดของเรา</h1>
+        <p class="text-center text-gray-500 mb-10">รวมภาพผลงานการจัดสวนและบริการต่างๆ</p>
 
-        <div id="all-portfolio" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div id="all-portfolio" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             </div>
     </div>
 
@@ -107,16 +108,24 @@
         const container = document.getElementById('all-portfolio');
         let htmlContent = '';
         
-        // วนลูปเอามาทุกอัน (ใช้ Card Design แบบใหม่)
         projects.forEach(item => {
             htmlContent += `
-                <div onclick="openModal('${item.image}')" class="group relative overflow-hidden rounded-xl shadow-lg h-72 cursor-pointer bg-white">
-                    <img src="${item.image}" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt="${item.title}">
+                <div onclick="openModal('${item.image}')" class="bg-white rounded-xl shadow-md overflow-hidden cursor-pointer hover:shadow-2xl transition duration-300 transform hover:-translate-y-2 flex flex-col h-full border border-gray-100">
                     
-                    <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition duration-300 flex flex-col items-center justify-center text-white p-6 text-center backdrop-blur-sm">
-                        <h3 class="font-bold text-xl md:text-2xl mb-2 tracking-wide drop-shadow-md">${item.title}</h3>
-                        <p class="text-sm md:text-base text-gray-200 leading-relaxed font-light drop-shadow-sm">${item.category}</p>
+                    <div class="h-64 overflow-hidden relative group">
+                        <img src="${item.image}" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt="${item.title}">
+                        <div class="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
+                            <i class="fas fa-search-plus text-white/90 text-4xl drop-shadow-md transform scale-75 group-hover:scale-100 transition duration-300"></i>
+                        </div>
                     </div>
+                    
+                    <div class="p-6 flex-1 flex flex-col justify-center items-center text-center bg-white">
+                        <h3 class="font-bold text-xl text-gray-800 mb-2 leading-tight">${item.title}</h3>
+                        <p class="text-sm font-medium text-mercy-green uppercase tracking-wide bg-mercy-light inline-block py-1 px-3 rounded-full w-fit">
+                            ${item.category}
+                        </p>
+                    </div>
+
                 </div>
             `;
         });
