@@ -30,6 +30,15 @@
             }
         }
     </script>
+    <style>
+        /* CSS สำหรับ Effect ตอนเปลี่ยนรูปยกชุด */
+        .portfolio-content {
+            transition: opacity 0.8s ease-in-out; /* เปลี่ยนให้สมูทขึ้น 0.8 วิ */
+        }
+        .fade-out {
+            opacity: 0;
+        }
+    </style>
 </head>
 <body class="bg-mercy-light text-gray-700 font-sans antialiased">
 
@@ -192,6 +201,9 @@
     <script src="data.js"></script> 
     
     <script>
+        let isShufflePaused = false;
+        const container = document.getElementById('random-portfolio');
+
         // --- ส่วนจัดการ Modal (Popup รูปภาพ) ---
         function openModal(imageSrc) {
             const modal = document.getElementById('image-modal');
@@ -199,51 +211,84 @@
             
             modalImg.src = imageSrc; 
             modal.classList.remove('hidden'); 
-            modal.classList.add('flex'); 
+            modal.classList.add('flex');
+            
+            // หยุดสุ่มชั่วคราว
+            isShufflePaused = true;
         }
 
         function closeModal() {
             const modal = document.getElementById('image-modal');
             modal.classList.add('hidden'); 
             modal.classList.remove('flex');
-        }
-
-        // --- ส่วนแสดงผล Portfolio (ปรับปรุงใหม่ให้เหมือนหน้า portfolio.html) ---
-        function renderRandomPortfolio() {
-            const container = document.getElementById('random-portfolio');
-            const shuffled = projects.sort(() => 0.5 - Math.random());
-            const selected = shuffled.slice(0, 6);
-
-            let htmlContent = '';
-            selected.forEach(item => {
-                htmlContent += `
-                    <div onclick="openModal('${item.image}')" class="bg-white rounded-xl shadow-md overflow-hidden cursor-pointer hover:shadow-2xl transition duration-300 transform hover:-translate-y-2 flex flex-col h-full border border-gray-100">
-                        
-                        <div class="h-64 overflow-hidden relative group">
-                            <img src="${item.image}" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt="${item.title}">
-                            <div class="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
-                                <i class="fas fa-search-plus text-white/90 text-4xl drop-shadow-md transform scale-75 group-hover:scale-100 transition duration-300"></i>
-                            </div>
-                        </div>
-                        
-                        <div class="p-6 flex-1 flex flex-col justify-center items-center text-center bg-white">
-                            <h3 class="font-bold text-xl text-gray-800 mb-2 leading-tight">${item.title}</h3>
-                            <p class="text-sm font-medium text-mercy-green uppercase tracking-wide bg-mercy-light inline-block py-1 px-3 rounded-full w-fit">
-                                ${item.category}
-                            </p>
-                        </div>
-
-                    </div>
-                `;
-            });
             
-            container.innerHTML = htmlContent;
+            // กลับมาสุ่มต่อ
+            isShufflePaused = false;
         }
 
-        renderRandomPortfolio();
-    </script>
-    
-    <script>
+        // --- ฟังก์ชัน Render รูปภาพ 6 ช่อง ---
+        function renderPortfolioSet() {
+            // ถ้าหยุดสุ่มอยู่ ก็ไม่ต้องทำอะไร
+            if (isShufflePaused) return;
+
+            // เริ่ม Effect จางหาย (Fade Out)
+            // เราจะใส่ class 'opacity-0' ให้กับการ์ดทุกใบที่มีอยู่
+            const currentCards = container.querySelectorAll('.portfolio-content');
+            currentCards.forEach(card => card.classList.add('opacity-0'));
+
+            // รอ 0.2 วินาที (ให้จางหายหมดก่อน) แล้วค่อยเปลี่ยนเนื้อหา
+            setTimeout(() => {
+                // สุ่มข้อมูลใหม่ 6 อัน
+                const shuffled = projects.sort(() => 0.5 - Math.random());
+                const selected = shuffled.slice(0, 6);
+
+                let htmlContent = '';
+                selected.forEach(item => {
+                    // ใส่ class 'portfolio-content opacity-0' ไว้ก่อน เพื่อรอ Fade In
+                    htmlContent += `
+                        <div onclick="openModal('${item.image}')" class="portfolio-content opacity-0 bg-white rounded-xl shadow-md overflow-hidden cursor-pointer hover:shadow-2xl transition duration-500 transform hover:-translate-y-2 flex flex-col h-full border border-gray-100">
+                            
+                            <div class="h-64 overflow-hidden relative group">
+                                <img src="${item.image}" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt="${item.title}">
+                                <div class="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
+                                    <i class="fas fa-search-plus text-white/90 text-4xl drop-shadow-md transform scale-75 group-hover:scale-100 transition duration-300"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="p-6 flex-1 flex flex-col justify-center items-center text-center bg-white">
+                                <h3 class="font-bold text-xl text-gray-800 mb-2 leading-tight">${item.title}</h3>
+                                <p class="text-sm font-medium text-mercy-green uppercase tracking-wide bg-mercy-light inline-block py-1 px-3 rounded-full w-fit">
+                                    ${item.category}
+                                </p>
+                            </div>
+
+                        </div>
+                    `;
+                });
+                
+                // ใส่ HTML ใหม่เข้าไป
+                container.innerHTML = htmlContent;
+
+                // สั่งให้ค่อยๆ ปรากฏขึ้นมา (Fade In)
+                // ต้องใช้ setTimeout เล็กน้อยเพื่อให้ Browser รับรู้การเปลี่ยนแปลง DOM
+                setTimeout(() => {
+                    const newCards = container.querySelectorAll('.portfolio-content');
+                    newCards.forEach(card => card.classList.remove('opacity-0'));
+                }, 100);
+
+            }, 200); // รอให้ Fade Out จบก่อน (0.2s)
+        }
+
+        // --- เริ่มต้นทำงาน ---
+        
+        // 1. รันครั้งแรกทันที (ไม่ต้องรอเวลา)
+        renderPortfolioSet();
+
+        // 2. ตั้งเวลาให้ทำซ้ำทุกๆ 5 วินาที (4s แสดงผล + 1s เปลี่ยนรูป)
+        setInterval(renderPortfolioSet, 9000);
+
+
+        // --- Mobile Menu ---
         const btn = document.getElementById('mobile-menu-btn');
         const menu = document.getElementById('mobile-menu');
         const links = document.querySelectorAll('.mobile-link');
